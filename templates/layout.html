@@ -1,0 +1,54 @@
+{% import "wtf.html" as wtf %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+        {% block head %}
+        {% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-md navbar-light bg-secondary mb-1">
+          <div class="container-fluid">
+            <img src="{{ url_for('static', filename='favicon.ico') }}" alt="USDA Logo" width="72" height="51" class="mx-2">
+            <a class="navbar-brand" href="/">Basin Data Reports</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+              <ul class="navbar-nav">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="/">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                {% if session.get('basins', None) is not none %}
+                    <a class="nav-link dropdown-toggle" href="/wsor" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                      Available Basins
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <li class="dropdown-item"><i>As of: {{session.get('updated', "")}}</i></li>
+                        {% for i in session.get('basins', []) %}
+                            <li class="dropdown-item">
+                                <a href='/{{i}}'>{{i.upper()}}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                </li>
+              </ul>
+            </div>
+            {% block nav %}
+            {% endblock %}
+          </div>
+        </nav>
+        {% block body %}
+    
+        {% endblock %}
+        <script src="{{ url_for('static', filename='js/jquery.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js')}}"></script>
+        {% block script %}
+        {% endblock %}
+    </body>
+</html>
+

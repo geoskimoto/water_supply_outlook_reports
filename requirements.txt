@@ -1,0 +1,10 @@
+requests
+requests_cache
+Flask
+flask_wtf
+flask_session
+pandas
+pytz
+WTForms
+gunicorn
+gevent

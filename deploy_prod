@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# sets API server and launches app with one worker
+export API_SERVER=http://nrcscix0147.edc.ds1.usda.gov:8041
+source .venv/bin/activate
+
+gunicorn -w 1 \
+      -k gevent \
+      --timeout 120 \
+      -b 0.0.0.0:8090 \
+      --limit-request-line 0 \
+      --limit-request-field_size 0 \
+      "app:app"
+

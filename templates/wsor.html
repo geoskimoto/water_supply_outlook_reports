@@ -1,0 +1,52 @@
+{% extends "layout.html" %}
+{% block title %}{{basin_name.upper()}}{% endblock %}
+{% block nav %}
+    <button class="btn btn-primary" onclick="makePdf()">Save PDF</button>
+{% endblock %}
+{% block body %}
+    
+    <div id="wsor" class="container-fluid mx-auto mt-2">
+        <div class="m-4">
+            <h2>{{basin_name.title()}} Summary for {{title}}</h2>
+            <p><i>As of: {{session.get('updated', "")}}</i></p>
+        </div>
+        <div id="fcst" class="m-4">
+            {% for table in fcst_df %}
+                {% if table is not none %}
+                    {{ table|safe }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <div id="res" class="m-4">
+            {% for table in res_df %}
+                {% if table is not none %}
+                    <p style="page-break-before: always;"></p>
+                    {{ table|safe }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <div id="snow" class="m-4">
+            {% for table in snow_df %}
+                {% if table is not none %}
+                <p style="page-break-before: always;"></p>
+                    {{ table|safe }}
+                {% endif %}
+            {% endfor %}
+        </div>
+        
+        <div id="prec" class="m-4">
+            {% for table in prec_df %}
+                {% if table is not none %}
+                    <p style="page-break-before: always;"></p>
+                    {{ table|safe }}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+{% block script %}
+        <script src="{{ url_for('static', filename='js/html2pdf.bundle.min.js')}}"></script>
+        <script src="{{ url_for('static', filename='js/wsorPdf.js')}}"></script>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}404{% endblock %}
+{% block body %}
+    <div class="container-fluid mx-auto">
+        <div class="col d-flex justify-content-center">
+            <div class="card" style="width: 22rem;">
+              <img src="{{ url_for('static', filename='img/404.png')}}" class="card-img-top" alt="Picture of an confused snowflake">
+              <div class="card-body">
+                <h5 class="card-title">Page not found!</h5>
+                <p class="card-text">You poor snowflake, you seem to be lost</p>
+                <a href="/" class="btn btn-primary">Take me home</a>
+              </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

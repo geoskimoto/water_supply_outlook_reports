@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}Select a Basin{% endblock %}
+{% block body %}
+    <div class="container-fluid mx-auto">
+        <div class="col d-flex justify-content-center">
+            <div class="card" style="width: 30rem;">
+                <div class="card-body">
+                    <h4 class="card-title">Basin Reports</h4>
+                    <div class="card-text">
+                        <ul class="list-group list-group-flush">
+                        {% if not session['hierarchy'] %}
+                            {% for basin in session['basins'] %}
+                            <li class="list-group-item list-group-item-action">
+                                <a href='{{basin}}'>{{basin.upper()}}</a>
+                            </li>
+                            {% endfor %}
+                        {% else %}
+                            {% for major, minor in session['hierarchy'].items() %}                             
+                            <div class="dropdown">
+                                <a class="btn btn-secondary dropdown-toggle my-1" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                                  {{major.upper()}}
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                                {% for basin in minor %}
+                                    <li class="list-group-item list-group-item-action">
+                                        <a href='{{basin}}'>{{basin.upper()}}</a>
+                                    </li>
+                                {% endfor %}
+                                </ul>
+                            </div>          
+                            {% endfor %}
+                        {% endif %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
