@@ -31,9 +31,11 @@ app = Flask(
 
 app.secret_key = "super secret key"
 app.config["SESSION_TYPE"] = "filesystem"
+# app.config["SESSION_PERMANENT"] = False
 Session(app)
 
 BASIN_STATES = ("AK", "AZ", "CA", "CO", "ID", "MT", "NM", "NV", "OR", "UT", "WA", "WY")
+BASIN_TYPES = ("major", "minor", "misc")
 
 
 class BasinForm(FlaskForm):
@@ -41,11 +43,10 @@ class BasinForm(FlaskForm):
     state = SelectField(
         "Select State:",
         choices=[(i, i) for i in BASIN_STATES],
-        
     )
     month = SelectField(
         "Select Month:",
-        default=today.month if today.month in range(1,7) else 1,
+        default=today.month if today.month in range(1, 13) else 1,
         choices=[
             (1, "January"),
             (2, "February"),
@@ -53,19 +54,19 @@ class BasinForm(FlaskForm):
             (4, "April"),
             (5, "May"),
             (6, "June"),
+            (7, "July"),
+            (8, "August"),
+            (9, "September"),
+            (10, "October"),
+            (11, "November"),
+            (12, "December"),
         ],
     )
     year = SelectField(
-        "Select Year:",
-        choices=sorted(range(1980, today.year + 1), reverse=True)
+        "Select Year:", choices=sorted(range(1980, today.year + 1), reverse=True)
     )
     btype = SelectField(
-        "Select Basin Type:", 
-        choices=[
-            ("major", "Major Basins"), 
-            ("minor", "Minor Basins"), 
-            ("misc", "Misc Basins")
-        ]
+        "Select Basin Type:", choices=[(i, f"{i.title()} Basins") for i in BASIN_TYPES]
     )
     refresh = BooleanField(
         "Force Data Refresh",
@@ -75,23 +76,25 @@ class BasinForm(FlaskForm):
 
 @app.errorhandler(500)
 def page_not_found(e):
-    return render_template('500.html'), 500
+    return render_template("500.html"), 500
 
 
 @app.errorhandler(404)
 def server_error(e):
-    return render_template('404.html'), 404
+    return render_template("404.html"), 404
 
 
 @app.route("/", methods=("POST", "GET"))
 def pull_data():
     args = request.args
-    
-    if request.method == 'GET':
+    scrape_request = False
+    if request.method == "POST" and args.get("automate", False):
+        scrape_request = True
+    if request.method == "GET":
         form = BasinForm(data=args)
     else:
         form = BasinForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() or scrape_request:
         state = form.state.data
         month_digit = form.month.data
         year = form.year.data
@@ -101,8 +104,7 @@ def pull_data():
         if basin_type == "minor":
             basin_hierarchy = get_hierarchy(state=state, force_refresh=refresh)
             basin_hierarchy = {
-                k.lower(): [i.lower() for i in v] 
-                for k, v in basin_hierarchy.items()
+                k.lower(): [i.lower() for i in v] for k, v in basin_hierarchy.items()
             }
         fcst_json = get_wsor_data(
             endpoint="getFcstData",
@@ -202,7 +204,7 @@ def basin_reports(basin):
                     index=False,
                     na_rep="-",
                     border=0,
-                )
+                ),
             )
         ],
         snow_df=[
@@ -217,7 +219,7 @@ def basin_reports(basin):
                     index=False,
                     na_rep="-",
                     border=0,
-                )
+                ),
             )
         ],
         prec_df=[
@@ -232,7 +234,7 @@ def basin_reports(basin):
                     index=False,
                     na_rep="-",
                     border=0,
-                )
+                ),
             )
         ],
     )

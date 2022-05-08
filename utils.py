@@ -85,7 +85,7 @@ def get_hierarchy(state, domain=API_DOMAIN, cache_args=CACHE_ARGS, force_refresh
 
 
 def add_fcst_footer(fcst_html):
-    table_title="Streamflow Forecasts (kaf)"
+    table_title = "Streamflow Forecasts (kaf)"
     find_str = """<tr style="text-align: match-parent;">
       <th></th>
       <th></th>"""
@@ -100,13 +100,14 @@ def add_fcst_footer(fcst_html):
     2) Forecasts are for unimpaired flows. Actual flow will be dependent on management of upstream reservoirs and diversions.
     </caption>
     """
-    return fcst_html.replace('</table>', f'{fcst_caption}</table>')
+    return fcst_html.replace("</table>", f"{fcst_caption}</table>")
 
 
 def forecasts(basin, wsor_json):
     def add_footnotes():
-        #TODO: add footnotes, somehow...
+        # TODO: add footnotes, somehow...
         return
+
     def modify_exceedances(name, forecasts):
         for period, value_dict in forecasts.items():
             if "5" in value_dict.keys():
@@ -114,15 +115,15 @@ def forecasts(basin, wsor_json):
                 forecasts[period]["90"] = value_dict["95"]
                 del forecasts[period]["5"]
                 del forecasts[period]["95"]
-        return (name, forecasts) 
+        return (name, forecasts)
+
     basin_data = wsor_json[basin]
     site_meta = basin_data["site_meta"]
     if not site_meta:
         return pd.DataFrame()
     names = {i: site_meta[i]["name"] for i in site_meta.keys()}
     medians = {
-        i: wsor_json[basin]["fcst_med"][i]
-        for i in wsor_json[basin]["fcst_med"].keys()
+        i: wsor_json[basin]["fcst_med"][i] for i in wsor_json[basin]["fcst_med"].keys()
     }
     forecasts = {
         i: wsor_json[basin]["fcst_curr"][i]
@@ -145,17 +146,21 @@ def forecasts(basin, wsor_json):
     forecasts = pd.DataFrame(reformat_forecasts).T
     rename_cols = {i: f"{i}%" for i in forecasts.columns if str(i).isnumeric()}
     forecasts = forecasts.rename(columns=rename_cols)
-    col_sort = [i[1] for i in sorted(rename_cols.items(), key=lambda kv:(kv[1], kv[0]))]
+    col_sort = [
+        i[1] for i in sorted(rename_cols.items(), key=lambda kv: (kv[1], kv[0]))
+    ]
     col_sort = col_sort + ["30 yr. Median"]
     col_sort.insert(3, "% Median")
     forecasts = forecasts.fillna(value=np.nan)
+    if forecasts.empty:
+        return pd.DataFrame()
     return forecasts[col_sort].round(1)
 
 
 def add_prec_footer(basin_index, prec_html):
-      if not basin_index:
-          return prec_html
-      footer = f"""
+    if not basin_index:
+        return prec_html
+    footer = f"""
        <tfoot>
          <tr class="table-secondary">
            <td style="text-align:center; font-weight: bold;">Basin Index</td>
@@ -172,10 +177,12 @@ def add_prec_footer(basin_index, prec_html):
            <td style="font-weight: bold;">{basin_index['prec_ytd_ly_per_med']}%</td>
        </tfoot>
       </table>
-      """.replace("None%", "-")
+      """.replace(
+        "None%", "-"
+    )
 
-      return prec_html.replace("</table>", footer)
-    
+    return prec_html.replace("</table>", footer)
+
 
 def precipitation(basin, wsor_json):
     table_title = "Precipitation (in.)"
@@ -215,13 +222,13 @@ def precipitation(basin, wsor_json):
         inplace=True,
         how="all",
         subset=[
-            "prec_mnth_curr", 
-            "prec_mnth_med", 
+            "prec_mnth_curr",
+            "prec_mnth_med",
             "prec_mnth_ly",
             "prec_ytd_curr",
             "prec_ytd_med",
             "prec_ytd_ly",
-        ]
+        ],
     )
     if prec.empty:
         return pd.DataFrame()
@@ -257,9 +264,9 @@ def precipitation(basin, wsor_json):
 
 
 def add_snow_footer(basin_index, snow_html):
-      if not basin_index:
-          return snow_html
-      footer = f"""
+    if not basin_index:
+        return snow_html
+    footer = f"""
        <tfoot>
          <tr class="table-secondary">
            <td style="text-align:center; font-weight: bold;">Basin Index</td>
@@ -272,9 +279,11 @@ def add_snow_footer(basin_index, snow_html):
            <td style="font-weight: bold;">{basin_index['wteq_ly_per_med']}%</td>
        </tfoot>
       </table>
-      """.replace("None%", "-")
+      """.replace(
+        "None%", "-"
+    )
 
-      return snow_html.replace("</table>", footer)
+    return snow_html.replace("</table>", footer)
 
 
 def snowpack_sites(basin, wsor_json):
@@ -345,7 +354,9 @@ def add_res_footer(basin_index, res_html):
          <td style="font-weight: bold;">{basin_index['res_ly_per_med']}%</td>
      </tfoot>
     </table>
-    """.replace("None%", "-")
+    """.replace(
+        "None%", "-"
+    )
 
     return res_html.replace("</table>", footer)
 

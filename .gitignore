@@ -143,3 +143,6 @@ flask_session/
 #dbs
 dbs/
 *.db
+
+# export dir
+export/
